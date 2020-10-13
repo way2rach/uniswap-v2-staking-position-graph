@@ -8,9 +8,10 @@ type MiningPosition @entity {
   user: User!
   miningPool: MiningPool!
   balance: BigInt!
-
+  claimedUni: BigInt!
 }
-type Pair @entity {
+#TODO: Give pool a better name
+type Pool @entity {
   id: ID!
   token0: String!
   token1: String!
@@ -18,8 +19,7 @@ type Pair @entity {
 
 type MiningPool @entity {
   id : ID!
-  pair: Pair!
-#  stakingToken: Bytes!
+  pair: Pool!
   totalStaked: BigInt!
   rewardRate: BigInt!
 }

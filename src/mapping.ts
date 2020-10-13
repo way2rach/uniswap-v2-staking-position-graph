@@ -1,6 +1,9 @@
 import {RewardAdded, RewardPaid, Withdrawn, Staked, StakingRewards} from "./types/StakingRewards/StakingRewards";
-import {User, Pair, MiningPool, MiningPosition} from "./types/schema";
-import {BigInt} from '@graphprotocol/graph-ts/index'
+import {User, Pool, MiningPool, MiningPosition} from "./types/schema";
+import {BigInt} from '@graphprotocol/graph-ts/index';
+import { Pair } from './types/StakingRewards/Pair';
+import { fetchTokenSymbol } from './helpers';
+
 
 export function handleStaked(event: Staked): void {
 
@@ -9,6 +12,7 @@ export function handleStaked(event: Staked): void {
     if (user === null) {
         user = new User(event.params.user.toHexString());
     }
+
     user.save();
 
 
@@ -17,12 +21,23 @@ export function handleStaked(event: Staked): void {
     if (miningPool === null) {
         miningPool = new MiningPool(event.address.toHexString());
         let stakingContract = StakingRewards.bind(event.address);
-        let stakingToken = stakingContract.stakingToken();
-        miningPool.stakingToken = stakingToken;
         let rewardRatePerSec = stakingContract.rewardRate();
         // TODO:make reward rate work, currently shown as zero
         miningPool.rewardRate = rewardRatePerSec;
         miningPool.totalStaked = BigInt.fromI32(0);
+
+        let stakingToken = stakingContract.stakingToken();
+        let pool = Pool.load(stakingToken.toHexString());
+        if (pool === null) {
+            pool = new Pool(stakingToken.toHexString());
+            let pairContract = Pair.bind(stakingToken);
+            let token0 = pairContract.token0();
+            let token1 = pairContract.token1();
+            pool.token0 = fetchTokenSymbol(token0);
+            pool.token1 = fetchTokenSymbol(token1);
+            pool.save();
+        }
+        miningPool.pair = pool.id;
     }
 
     miningPool.totalStaked = miningPool.totalStaked.plus(event.params.amount);
@@ -38,6 +53,7 @@ export function handleStaked(event: Staked): void {
         miningPosition.user = user.id;
         miningPosition.miningPool = miningPool.id;
         miningPosition.balance = BigInt.fromI32(0);
+        miningPosition.claimedUni = BigInt.fromI32(0);
     }
     miningPosition.balance = miningPosition.balance.plus(event.params.amount);
 
@@ -45,11 +61,29 @@ export function handleStaked(event: Staked): void {
 }
 
 export function handleRewardAdded(event: RewardAdded): void {
+
 }
 
 export function handleRewardPaid(event: RewardPaid): void {
+    let miningPositionId = event.params.user.toHexString().concat('-').concat(event.address.toHexString());
+    let miningPosition = MiningPosition.load(miningPositionId);
+
+    miningPosition.claimedUni = miningPosition.claimedUni.plus(event.params.reward);
+
+    miningPosition.save();
 }
 
+
 export function handleWithdrawn(event: Withdrawn): void {
+
+    let miningPositionId = event.params.user.toHexString().concat('-').concat(event.address.toHexString());
+    let miningPosition = MiningPosition.load(miningPositionId);
+    let miningPool = MiningPool.load(event.address.toHexString());
+
+    let amount = event.params.amount;
+    miningPool.totalStaked = miningPool.totalStaked.minus(amount);
+    miningPosition.balance = miningPosition.balance.minus(amount);
+    miningPosition.save();
+    miningPool.save();
 }
 
