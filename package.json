@@ -1,0 +1,23 @@
+{
+  "name": "staking-rewards",
+  "version": "0.1.0",
+  "scripts": {
+    "build-contract": "solc contracts/Gravity.sol --abi -o abis --overwrite && solc contracts/Gravity.sol --bin -o bin --overwrite",
+    "create": "graph create way2rach/invoice --node https://api.thegraph.com/deploy/",
+    "create-local": "graph create way2rach/talisman --node http://127.0.0.1:8020",
+    "codegen": "graph codegen --output-dir src/types/",
+    "build": "graph build",
+    "deploy": "graph deploy way2rach/talisman --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy-local": "graph deploy way2rach/talisman --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.18.0",
+    "@graphprotocol/graph-ts": "0.18.0",
+    "@typescript-eslint/eslint-plugin": "2.0.0",
+    "@typescript-eslint/parser": "2.0.0",
+    "eslint": "6.2.2",
+    "eslint-config-prettier": "6.1.0",
+    "prettier": "1.18.2",
+    "typescript": "3.5.2"
+  }
+}

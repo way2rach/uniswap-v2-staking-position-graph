@@ -1,0 +1,27 @@
+type User @entity {
+  id: ID!
+  miningPosition: [MiningPosition!] @derivedFrom(field: "user")
+}
+
+type MiningPosition @entity {
+  id : ID!
+  user: User!
+  miningPool: MiningPool!
+  balance: BigInt!
+
+}
+type Pair @entity {
+  id: ID!
+  token0: String!
+  token1: String!
+}
+
+type MiningPool @entity {
+  id : ID!
+  pair: Pair!
+#  stakingToken: Bytes!
+  totalStaked: BigInt!
+  rewardRate: BigInt!
+}
+
+
