@@ -1,7 +1,7 @@
-import {RewardAdded, RewardPaid, Withdrawn, Staked, StakingRewards} from "./types/StakingRewards/StakingRewards";
+import {RewardAdded, RewardPaid, Withdrawn, Staked, StakingRewards} from "./types/StakingRewards0/StakingRewards";
 import {User, Pool, MiningPool, MiningPosition} from "./types/schema";
 import {BigInt} from '@graphprotocol/graph-ts/index';
-import { Pair } from './types/StakingRewards/Pair';
+import { Pair } from './types/StakingRewards0/Pair';
 import { fetchTokenSymbol } from './helpers';
 
 

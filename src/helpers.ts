@@ -1,6 +1,6 @@
 import { Address } from '@graphprotocol/graph-ts'
-import { ERC20 } from "./types/StakingRewards/ERC20";
-import { ERC20SymbolBytes } from "./types/StakingRewards/ERC20SymbolBytes";
+import { ERC20 } from "./types/StakingRewards0/ERC20";
+import { ERC20SymbolBytes } from "./types/StakingRewards0/ERC20SymbolBytes";
 
 export function isNullEthValue(value: string): boolean {
     return value == '0x0000000000000000000000000000000000000000000000000000000000000001';
