@@ -7,7 +7,7 @@ type MiningPosition @entity {
   id : ID!
   user: User!
   miningPool: MiningPool!
-  balance: BigInt!
+  balance: BigDecimal!
   claimedUni: BigInt!
 }
 #TODO: Give pool a better name

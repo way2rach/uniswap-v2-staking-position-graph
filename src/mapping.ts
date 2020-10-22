@@ -1,6 +1,6 @@
 import {RewardAdded, RewardPaid, Withdrawn, Staked, StakingRewards} from "./types/StakingRewards0/StakingRewards";
 import {User, Pool, MiningPool, MiningPosition} from "./types/schema";
-import {BigInt} from '@graphprotocol/graph-ts/index';
+import {BigInt, BigDecimal, Value} from '@graphprotocol/graph-ts/index';
 import { Pair } from './types/StakingRewards0/Pair';
 import { fetchTokenSymbol } from './helpers';
 
@@ -52,11 +52,11 @@ export function handleStaked(event: Staked): void {
         miningPosition = new MiningPosition(miningPositionId);
         miningPosition.user = user.id;
         miningPosition.miningPool = miningPool.id;
-        miningPosition.balance = BigInt.fromI32(0);
+        miningPosition.balance = BigDecimal.fromString('0');
         miningPosition.claimedUni = BigInt.fromI32(0);
     }
-    miningPosition.balance = miningPosition.balance.plus(event.params.amount);
-
+    let amount = event.params.amount.divDecimal(BigDecimal.fromString('1000000000000000000'))
+    miningPosition.balance = miningPosition.balance.plus(amount);
     miningPosition.save();
 }
 
@@ -80,8 +80,8 @@ export function handleWithdrawn(event: Withdrawn): void {
     let miningPosition = MiningPosition.load(miningPositionId);
     let miningPool = MiningPool.load(event.address.toHexString());
 
-    let amount = event.params.amount;
-    miningPool.totalStaked = miningPool.totalStaked.minus(amount);
+    let amount = event.params.amount.divDecimal(BigDecimal.fromString('1000000000000000000'))
+    miningPool.totalStaked = miningPool.totalStaked.minus(BigInt.fromI32(amount as i32));
     miningPosition.balance = miningPosition.balance.minus(amount);
     miningPosition.save();
     miningPool.save();
