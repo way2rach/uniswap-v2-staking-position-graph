@@ -24,7 +24,7 @@ export function handleStaked(event: Staked): void {
         let rewardRatePerSec = stakingContract.rewardRate();
         // TODO:make reward rate work, currently shown as zero
         miningPool.rewardRate = rewardRatePerSec;
-        miningPool.totalStaked = BigInt.fromI32(0);
+        miningPool.totalStaked = BigDecimal.fromString('0');
 
         let stakingToken = stakingContract.stakingToken();
         let pool = Pool.load(stakingToken.toHexString());
@@ -40,7 +40,8 @@ export function handleStaked(event: Staked): void {
         miningPool.pair = pool.id;
     }
 
-    miningPool.totalStaked = miningPool.totalStaked.plus(event.params.amount);
+
+    miningPool.totalStaked = miningPool.totalStaked.plus(event.params.amount.divDecimal(BigDecimal.fromString('1000000000000000000')));
 
     miningPool.save();
 
@@ -53,9 +54,9 @@ export function handleStaked(event: Staked): void {
         miningPosition.user = user.id;
         miningPosition.miningPool = miningPool.id;
         miningPosition.balance = BigDecimal.fromString('0');
-        miningPosition.claimedUni = BigInt.fromI32(0);
+        miningPosition.claimedUni = BigDecimal.fromString('0');
     }
-    let amount = event.params.amount.divDecimal(BigDecimal.fromString('1000000000000000000'))
+    let amount = event.params.amount.divDecimal(BigDecimal.fromString('1000000000000000000'));
     miningPosition.balance = miningPosition.balance.plus(amount);
     miningPosition.save();
 }
@@ -68,7 +69,9 @@ export function handleRewardPaid(event: RewardPaid): void {
     let miningPositionId = event.params.user.toHexString().concat('-').concat(event.address.toHexString());
     let miningPosition = MiningPosition.load(miningPositionId);
 
-    miningPosition.claimedUni = miningPosition.claimedUni.plus(event.params.reward);
+    let reward = event.params.reward.divDecimal(BigDecimal.fromString('1000000000000000000'));
+
+    miningPosition.claimedUni = miningPosition.claimedUni.plus(reward);
 
     miningPosition.save();
 }
@@ -81,7 +84,7 @@ export function handleWithdrawn(event: Withdrawn): void {
     let miningPool = MiningPool.load(event.address.toHexString());
 
     let amount = event.params.amount.divDecimal(BigDecimal.fromString('1000000000000000000'))
-    miningPool.totalStaked = miningPool.totalStaked.minus(BigInt.fromI32(amount as i32));
+    miningPool.totalStaked = miningPool.totalStaked.minus(amount);
     miningPosition.balance = miningPosition.balance.minus(amount);
     miningPosition.save();
     miningPool.save();

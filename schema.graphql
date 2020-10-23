@@ -8,7 +8,7 @@ type MiningPosition @entity {
   user: User!
   miningPool: MiningPool!
   balance: BigDecimal!
-  claimedUni: BigInt!
+  claimedUni: BigDecimal!
 }
 #TODO: Give pool a better name
 type Pool @entity {
@@ -20,7 +20,7 @@ type Pool @entity {
 type MiningPool @entity {
   id : ID!
   pair: Pool!
-  totalStaked: BigInt!
+  totalStaked: BigDecimal!
   rewardRate: BigInt!
 }
 
